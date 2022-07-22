@@ -1,3 +1,3 @@
 # phisma
 
-<em>PH</em>P <em>I</em>nstallation<em>s Ma</em>nager
+<strong>PH</strong>P <strong>I</strong>nstallation<strong>s Ma</strong>nager
