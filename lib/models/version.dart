@@ -1,59 +1,83 @@
-import 'package:flutter/material.dart';
+import 'dart:io';
 
-class Version with ChangeNotifier {
-  static final RegExp _versionRegex = RegExp(r'(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)(?<flag>[^-]+)?-(?<safety>n?ts)-(?<os>[^-]+)-(?<compiler>[^-]+)-(?<arch>[^-]+)$');
+class Version {
+  static final RegExp _pathVersionRegex = RegExp(r'(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)(?<flag>[^-]+)?-(?<safety>n?ts)-(?<os>[^-]+)-(?<compiler>[^-]+)-(?<arch>[^-]+)$');
+  static final RegExp _cliVersionRegex = RegExp(r'^PHP (?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)(?<flag>\\S+)?\\s\\((?<interface>\\w+)\\)\\s\\(built: (?<date>.+)\\s(?<time>.+)\\)\\s\\((?<safety>(?:Z|N)?TS)?(?:\\s(?<compiler>.+?))?(?:\\s(?<arch>x\\d+?))?(?:\\s(?<debug>DEBUG))?(?:\\s(?<gcov>GCOV))?\\)$', multiLine: true);
 
-  String _path;
-  RegExpMatch? _match;
+  int? major;
+  int? minor;
+  int? patch;
+  String? flag;
+  bool? threadSafe;
+  String? arch;
+  String? compiler;
+  DateTime? buildTimestamp;
 
-  int? _major;
-  int? _minor;
-  int? _patch;
-  String? _flag;
-  bool? _threadSafe;
-  String? _arch;
-  String? _compiler;
+  Version({
+    this.major,
+    this.minor,
+    this.patch,
+    this.flag,
+    this.threadSafe,
+    this.arch,
+    this.compiler,
+    this.buildTimestamp,
+  });
 
-  Version(this._path);
+  factory Version.fromPath(String path) {
+    final match = _pathVersionRegex.firstMatch(path);
+    if (match == null) {
+      throw ArgumentError('Cant match version to path: $path', path);
+    }
 
-  String get path => _path;
-
-  set path(String value) {
-    _path = value;
-    _match = null;
-    _major = null;
-    _minor = null;
-    _patch = null;
-    _flag = null;
-    _threadSafe = null;
-    _arch = null;
-    _compiler = null;
-
-    notifyListeners();
+    return Version(
+      major: _tryParseIntFromPath(match, 'major'),
+      minor: _tryParseIntFromPath(match, 'minor'),
+      patch: _tryParseIntFromPath(match, 'patch'),
+      flag: match.namedGroup('flag'),
+      threadSafe: match.namedGroup('safety') == 'ts',
+      arch: match.namedGroup('arch'),
+      compiler: match.namedGroup('compiler'),
+    );
   }
 
-  get major => _major ??= _tryParseIntFromPath('major');
-  get minor => _minor ??= _tryParseIntFromPath('minor');
-  get patch => _patch ??= _tryParseIntFromPath('patch');
-  get flag => _flag ??= _tryGetFromPath('flag');
-  get threadSafe => _threadSafe ??= _tryGetFromPath('safety') == 'ts';
-  get arch => _arch ??= _tryGetFromPath('arch');
-  get compiler => _compiler ??= _tryGetFromPath('compiler');
+  factory Version.fromExecutable(String path) {
+    final result = Process.runSync(path, ['--version']);
+    if (result.exitCode != 0) {
+      throw ArgumentError('Cant get version from executable: $path', path);
+    }
 
-  String? _tryGetFromPath(String group) {
-    _match ??= _versionRegex.firstMatch(_path);
-
-    return _match?.namedGroup(group);
+    return Version.fromVersionOutput(result.stdout as String);
   }
 
-  int? _tryParseIntFromPath(String group) {
-    final str = _tryGetFromPath(group);
+  factory Version.fromVersionOutput(String output) {
+    final match = _cliVersionRegex.firstMatch(output);
+    if (match == null) {
+      throw ArgumentError('Cant match version to output: $output', output);
+    }
+
+    return Version(
+      major: _tryParseIntFromPath(match, 'major'),
+      minor: _tryParseIntFromPath(match, 'minor'),
+      patch: _tryParseIntFromPath(match, 'patch'),
+      flag: match.namedGroup('flag'),
+      threadSafe: match.namedGroup('safety') != 'NTS',
+      arch: match.namedGroup('arch'),
+      compiler: match.namedGroup('compiler'),
+      buildTimestamp: DateTime.parse('${match.namedGroup('date')} ${match.namedGroup('time')}'),
+    );
+  }
+
+  static int? _tryParseIntFromPath(RegExpMatch match, String group) {
+    final str = match.namedGroup(group);
 
     return str != null ? int.tryParse(str) : null;
   }
 
+  String get name => '$major.$minor.$patch${flag ?? ''}';
+
   @override
   String toString() {
-    return 'Version{path: $path, major: $major, minor: $minor, patch: $patch, flag: $flag, threadSafe: $threadSafe, arch: $arch, compiler: $compiler}';
+    return 'Version{major: $major, minor: $minor, patch: $patch, flag: $flag, threadSafe: $threadSafe, arch: $arch, compiler: $compiler}';
   }
 }

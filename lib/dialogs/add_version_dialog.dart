@@ -63,7 +63,7 @@ class _AddVersionDialogState extends State<AddVersionDialog> {
           onPressed: _path == null
               ? null
               : () {
-                  final version = Version(_path!);
+                  final version = Version.fromPath(_path!);
                   Navigator.of(context).pop(version);
                 },
           child: const Text("Add"),

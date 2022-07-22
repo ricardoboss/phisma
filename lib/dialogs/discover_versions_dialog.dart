@@ -69,7 +69,15 @@ class _DiscoverVersionsDialogState extends State<DiscoverVersionsDialog> {
                   final versions = d
                       .listSync(recursive: false)
                       .whereType<Directory>()
-                      .map((d) => Version(d.path))
+                      .map((d) {
+                        try {
+                          return Version.fromPath(d.path);
+                        } catch (e) {
+                          return null;
+                        }
+                      })
+                      .where((v) => v != null)
+                      .cast<Version>()
                       .toList();
 
                   Navigator.of(context).pop(versions);
