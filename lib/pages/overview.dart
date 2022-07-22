@@ -1,35 +1,30 @@
 import 'package:flutter/material.dart';
-import 'package:phisma/models/version.dart';
-import 'package:provider/provider.dart';
+import 'package:phisma/subviews/settings_subview.dart';
+import 'package:phisma/subviews/versions_subview.dart';
+import 'package:phisma/widgets/stylized_title.dart';
 
 class OverviewPage extends StatelessWidget {
   const OverviewPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    const padding = 8.0;
+
     return Scaffold(
-      body: SingleChildScrollView(
+      body: Padding(
+        padding: const EdgeInsets.all(padding),
         child: Column(
-          children: <Widget>[
-            const Text('Overview'),
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: const <Widget>[
+            StylizedTitle(),
+            SizedBox(height: padding),
+            Expanded(
+              child: VersionsSubview(),
+            ),
+            SizedBox(height: padding),
             SizedBox(
               height: 200,
-              child: SingleChildScrollView(
-                child: ChangeNotifierProvider(
-                  create: (_) => Version("C:\\Program Files\\PHP_\\php-8.2.0beta1-nts-Win32-vs16-x64"),
-                  builder: (ctx, _) => Center(
-                    child: Text(ctx.watch<Version>().toString()),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(
-              height: 200,
-              child: SingleChildScrollView(
-                child: Center(
-                  child: Text('Settings'),
-                ),
-              ),
+              child: SettingsSubview(),
             ),
           ],
         ),
