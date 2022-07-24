@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:phisma/models/version.dart';
+import 'package:phisma/models/version_mapping.dart';
 
-class Versions with ChangeNotifier {
-  final Set<Version> _versions = {};
+class VersionMappings with ChangeNotifier {
+  final Set<VersionMapping> _versions = {};
 
-  Iterable<Version> get versions => _versions;
+  Iterable<VersionMapping> get versions => _versions;
 
-  void addVersion(Version version) {
+  void addVersion(VersionMapping version) {
     _versions.add(version);
 
     notifyListeners();
   }
 
-  void removeVersion(Version version) {
+  void removeVersion(VersionMapping version) {
     _versions.remove(version);
 
     notifyListeners();

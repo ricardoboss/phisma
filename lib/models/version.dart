@@ -2,7 +2,7 @@ import 'dart:io';
 
 class Version {
   static final RegExp _pathVersionRegex = RegExp(r'(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)(?<flag>[^-]+)?-(?<safety>n?ts)-(?<os>[^-]+)-(?<compiler>[^-]+)-(?<arch>[^-]+)$');
-  static final RegExp _cliVersionRegex = RegExp(r'^PHP (?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)(?<flag>\\S+)?\\s\\((?<interface>\\w+)\\)\\s\\(built: (?<date>.+)\\s(?<time>.+)\\)\\s\\((?<safety>(?:Z|N)?TS)?(?:\\s(?<compiler>.+?))?(?:\\s(?<arch>x\\d+?))?(?:\\s(?<debug>DEBUG))?(?:\\s(?<gcov>GCOV))?\\)$', multiLine: true);
+  static final RegExp _cliVersionRegex = RegExp(r'^PHP (?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)(?<flag>\S+)?\s\((?<interface>\w+)\)\s\(built: (?<date>.+)\s(?<time>.+)\)\s\(\s*(?<safety>(?:Z|N)?TS)?(?:\s(?<compiler>.+?))?(?:\s(?<arch>x\d+?)\s*)?(?:\s(?<debug>DEBUG))?(?:\s(?<gcov>GCOV))?\)$', multiLine: true, caseSensitive: false);
 
   int? major;
   int? minor;
@@ -64,7 +64,7 @@ class Version {
       threadSafe: match.namedGroup('safety') != 'NTS',
       arch: match.namedGroup('arch'),
       compiler: match.namedGroup('compiler'),
-      buildTimestamp: DateTime.parse('${match.namedGroup('date')} ${match.namedGroup('time')}'),
+      //buildTimestamp: DateTime.parse('${match.namedGroup('date')} ${match.namedGroup('time')}'),
     );
   }
 

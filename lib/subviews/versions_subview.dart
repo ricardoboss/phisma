@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:phisma/dialogs/add_version_dialog.dart';
 import 'package:phisma/dialogs/discover_versions_dialog.dart';
 import 'package:phisma/models/version.dart';
+import 'package:phisma/models/version_mapping.dart';
 import 'package:phisma/models/versions.dart';
 import 'package:phisma/widgets/versions_list.dart';
 import 'package:provider/provider.dart';
@@ -13,7 +14,7 @@ class VersionsSubview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<Versions>(
+    return Consumer<VersionMappings>(
       builder: (_, vs, __) => Container(
         decoration: BoxDecoration(
           border: Border.all(color: Theme.of(context).dividerColor),
@@ -39,7 +40,7 @@ class VersionsSubview extends StatelessWidget {
                       icon: const Icon(Icons.add),
                       label: const Text("Add"),
                       onPressed: () async {
-                        final version = await showDialog<Version?>(
+                        final version = await showDialog<VersionMapping?>(
                           context: context,
                           builder: (ctx) => const AddVersionDialog(),
                         );
@@ -67,7 +68,7 @@ class VersionsSubview extends StatelessWidget {
                       ),
                       label: const Text("Discover"),
                       onPressed: () async {
-                        final versions = await showDialog<List<Version>?>(
+                        final versions = await showDialog<List<VersionMapping>?>(
                           context: context,
                           builder: (ctx) => const DiscoverVersionsDialog(),
                         );

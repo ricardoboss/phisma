@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:phisma/models/version.dart';
+import 'package:phisma/models/version_mapping.dart';
 
 class AddVersionDialog extends StatefulWidget {
   const AddVersionDialog({Key? key}) : super(key: key);
@@ -64,7 +67,8 @@ class _AddVersionDialogState extends State<AddVersionDialog> {
               ? null
               : () {
                   final version = Version.fromPath(_path!);
-                  Navigator.of(context).pop(version);
+                  final mapping = VersionMapping(version: version, path: Directory(_path!));
+                  Navigator.of(context).pop(mapping);
                 },
           child: const Text("Add"),
         ),

@@ -7,7 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   final settings = Settings();
-  final versions = Versions();
+  final versions = VersionMappings();
 
   SharedPreferences.getInstance().then((prefs) {
     if (prefs.containsKey('theme')) {

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:phisma/models/version.dart';
+import 'package:phisma/models/version_mapping.dart';
 
 class DiscoverVersionsDialog extends StatefulWidget {
   const DiscoverVersionsDialog({super.key});
@@ -67,17 +68,21 @@ class _DiscoverVersionsDialogState extends State<DiscoverVersionsDialog> {
               : () {
                   final d = Directory(_parentPath!);
                   final versions = d
-                      .listSync(recursive: false)
+                      .listSync(recursive: true)
                       .whereType<Directory>()
                       .map((d) {
                         try {
-                          return Version.fromPath(d.path);
+                          final bin = "${d.path}/php.exe";
+                          if (File(bin).existsSync()) {
+                            final version = Version.fromExecutable(bin);
+                            return VersionMapping(version: version, path: d);
+                          }
                         } catch (e) {
                           return null;
                         }
                       })
                       .where((v) => v != null)
-                      .cast<Version>()
+                      .cast<VersionMapping>()
                       .toList();
 
                   Navigator.of(context).pop(versions);
